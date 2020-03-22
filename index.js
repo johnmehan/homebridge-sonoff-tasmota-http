@@ -49,16 +49,20 @@ SonoffTasmotaHTTPAccessory.prototype.setState = function(toggle, callback) {
   var that = this
   request("http://" + that.hostname + "/cm?user=admin&password=" + that.password + "&cmnd=Power" + that.relay + newstate, function(error, response, body) {
     if (error) return callback(error);
-    var sonoff_reply = JSON.parse(body); // {"POWER":"ON"}
-    that.log("Sonoff HTTP: " + that.hostname + ", Relay " + that.relay + ", Set State: " + JSON.stringify(sonoff_reply));
-    switch (sonoff_reply["POWER" + that.relay]) {
-      case "ON":
-        callback();
-        break;
-      case "OFF":
-        callback();
-        break;
-    }
+    try{
+      var sonoff_reply = JSON.parse(body); // {"POWER":"ON"}
+      that.log("Sonoff HTTP: " + that.hostname + ", Relay " + that.relay + ", Set State: " + JSON.stringify(sonoff_reply));
+      switch (sonoff_reply["POWER" + that.relay]) {
+        case "ON":
+          callback();
+          break;
+        case "OFF":
+          callback();
+          break;
+      }
+    }catch(e){
+      return callback(error);
+    }  
   })
 }
 
